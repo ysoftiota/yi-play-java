@@ -25,12 +25,8 @@ public class EchoSysexExampleMain {
         device.start();
         device.ensureInitializationIsDone();
         
-        device.addCustomSysexEventListener(new CustomSysexEventListener<SysexEvent>() {
-            @Override
-            public void onCustomSysexMessage(byte sysexByte, SysexEvent event) {
-                System.out.println("Recieved custom sysex message:" + event.getMessage());
-            }
-
+        device.addCustomSysexEventListener((CustomSysexEventListener<SysexEvent>) (byte sysexByte, SysexEvent event) -> {
+            System.out.println("Recieved custom sysex message:" + event.getMessage());
         });
         
         device.sendCustomSysex((byte) 0x01, FirmataMessageFactory.encodeString("Hello world!"));

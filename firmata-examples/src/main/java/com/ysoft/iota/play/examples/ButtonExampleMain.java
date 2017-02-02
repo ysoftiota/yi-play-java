@@ -1,10 +1,12 @@
 package com.ysoft.iota.play.examples;
 
+import javax.swing.JFrame;
 import org.firmata4j.DeviceConfiguration;
 import org.firmata4j.IOEvent;
 import org.firmata4j.Pin;
 import org.firmata4j.PinEventListener;
 import org.firmata4j.firmata.FirmataDevice;
+import org.firmata4j.ui.JPinboard;
 
 /**
  *
