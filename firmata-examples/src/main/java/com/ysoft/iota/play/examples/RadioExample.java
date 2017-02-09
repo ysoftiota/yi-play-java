@@ -1,0 +1,79 @@
+package com.ysoft.iota.play.examples;
+
+import java.util.Date;
+import org.firmata4j.AbstractCustomSysexEvent;
+import org.firmata4j.CustomSysexEventListener;
+import org.firmata4j.DeviceConfiguration;
+import org.firmata4j.firmata.FirmataDevice;
+import org.firmata4j.firmata.FirmataUtils;
+import org.firmata4j.firmata.parser.FirmataToken;
+import org.firmata4j.firmata.parser.WaitingForMessageState;
+import org.firmata4j.fsm.AbstractCustomState;
+import org.firmata4j.fsm.Event;
+import org.firmata4j.fsm.EventType;
+
+/**
+ *
+ * @author Stepan Novacek &lt;stepan.novacek@ysoft.com&gt;
+ */
+public class RadioExample {
+
+    public static void main(String[] args) throws Exception {
+
+        DeviceConfiguration deviceConfiguration = new DeviceConfiguration("COM13")
+                .addCustomSysex((byte) 0x03, RadioMessageState.class, RadioSysexEvent.class);
+
+        FirmataDevice device = new FirmataDevice(deviceConfiguration);
+        device.start();
+        device.ensureInitializationIsDone();
+
+        //send RF configuration(sysex 0x02) - net ID 66, node ID 2
+        device.sendCustomSysex((byte) 0x02, new byte[]{66, 2});
+
+        device.addCustomSysexEventListener((CustomSysexEventListener<RadioSysexEvent>) (byte sysexByte, RadioSysexEvent event) -> {
+            System.out.println(new Date() + String.format(" Recieved temperature: %.2f°C from node %d, RSSI:%d dBm",
+                    event.temperature, event.nodeId, event.rssi));
+        });
+    }
+
+    public static class RadioMessageState extends AbstractCustomState {
+
+        @Override
+        public void process(byte b) {
+            if (b == FirmataToken.END_SYSEX) {
+                byte[] buffer = getBuffer();
+                byte[] decodedBuffer = FirmataUtils.decodeBytes(buffer);
+                Event event = new Event(FirmataToken.CUSTOM_SYSEX_MESSAGE, EventType.FIRMATA_MESSAGE_EVENT_TYPE);
+                event.setBodyItem("nodeId", decodedBuffer[0]);
+                event.setBodyItem("rssi", decodedBuffer[1]);
+                if (decodedBuffer.length > 3) {
+                    int t = ((decodedBuffer[2] * 256) + decodedBuffer[3]);
+                    double ctemp = ((175.72 * t) / 65536.0) - 46.85;
+                    event.setBodyItem("temp", ctemp);
+                }
+                transitTo(WaitingForMessageState.class, b);
+                publish(event);
+            } else {
+                bufferize(b);
+            }
+        }
+
+    }
+
+    public static class RadioSysexEvent extends AbstractCustomSysexEvent {
+
+        private byte nodeId;
+        private byte rssi;
+        private double temperature;
+
+        @Override
+        protected void loadCustomContent(Event event) {
+            if (event.getBodyItem("temp") != null) {
+                temperature = (double) event.getBodyItem("temp");
+            }
+            rssi = (byte) event.getBodyItem("rssi");
+            nodeId = (byte) event.getBodyItem("nodeId");
+        }
+    }
+
+}

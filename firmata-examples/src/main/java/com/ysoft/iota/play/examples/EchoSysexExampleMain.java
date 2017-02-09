@@ -4,7 +4,7 @@ import org.firmata4j.AbstractCustomSysexEvent;
 import org.firmata4j.CustomSysexEventListener;
 import org.firmata4j.DeviceConfiguration;
 import org.firmata4j.firmata.FirmataDevice;
-import org.firmata4j.firmata.FirmataMessageFactory;
+import org.firmata4j.firmata.FirmataUtils;
 import org.firmata4j.firmata.parser.FirmataToken;
 import org.firmata4j.firmata.parser.WaitingForMessageState;
 import org.firmata4j.fsm.AbstractCustomState;
@@ -24,12 +24,12 @@ public class EchoSysexExampleMain {
         FirmataDevice device = new FirmataDevice(deviceConfiguration);
         device.start();
         device.ensureInitializationIsDone();
-        
+
         device.addCustomSysexEventListener((CustomSysexEventListener<SysexEvent>) (byte sysexByte, SysexEvent event) -> {
             System.out.println("Recieved custom sysex message:" + event.getMessage());
         });
-        
-        device.sendCustomSysex((byte) 0x01, FirmataMessageFactory.encodeString("Hello world!"));
+
+        device.sendCustomSysex((byte) 0x01, "Hello world!");
 
     }
 
@@ -57,7 +57,7 @@ public class EchoSysexExampleMain {
         public void process(byte b) {
             if (b == FirmataToken.END_SYSEX) {
                 byte[] buffer = getBuffer();
-                String value = decode(buffer, 0, buffer.length);
+                String value = new String(FirmataUtils.decodeBytes(buffer));
                 Event event = new Event(FirmataToken.CUSTOM_SYSEX_MESSAGE, EventType.FIRMATA_MESSAGE_EVENT_TYPE);
                 event.setBodyItem(FirmataToken.STRING_MESSAGE, value);
                 transitTo(WaitingForMessageState.class, b);
@@ -67,14 +67,6 @@ public class EchoSysexExampleMain {
             }
         }
 
-        private String decode(byte[] buffer, int offset, int length) {
-            StringBuilder result = new StringBuilder();
-            length = length >>> 1;
-            for (int i = 0; i < length; i++) {
-                result.append((char) (buffer[offset++] + (buffer[offset++] << 7)));
-            }
-            return result.toString();
-        }
     }
 
 }

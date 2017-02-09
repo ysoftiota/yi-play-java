@@ -22,7 +22,7 @@ public class AccelerometerExampleMain {
         FirmataDevice device = new FirmataDevice(deviceConfiguration);
         device.start();
         device.ensureInitializationIsDone();
-        I2CDevice i2cDevice =  device.getI2CDevice((byte) 0x28);
+        I2CDevice i2cDevice = device.getI2CDevice((byte) 0x28);
 
         byte value = (byte) 0x07;  //Enables all three axis
         value |= (LIS3DE_DATARATE_10_HZ << 4);  // Set sampling interval
@@ -42,9 +42,12 @@ public class AccelerometerExampleMain {
             if (accZ > 128) {
                 accZ -= 256;
             }
-            System.out.println(String.format("X:%d Y:%d Z:%d", accX, accY, accZ));
+            float dgrX = accX / 256f * 360f;
+            float dgrY = accY / 256f * 360f;
+            float dgrZ = accZ / 256f * 360f;
+            System.out.println(String.format("X:%.2f° Y:%.2f° Z:%.2f°", dgrX, dgrY, dgrZ));
         });
-        
+
         //start continuous reading from device
         i2cDevice.ask(register, (byte) 6, true);
 
