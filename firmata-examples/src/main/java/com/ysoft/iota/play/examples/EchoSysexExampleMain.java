@@ -6,10 +6,8 @@ import org.firmata4j.DeviceConfiguration;
 import org.firmata4j.firmata.FirmataDevice;
 import org.firmata4j.firmata.FirmataUtils;
 import org.firmata4j.firmata.parser.FirmataToken;
-import org.firmata4j.firmata.parser.WaitingForMessageState;
 import org.firmata4j.fsm.AbstractCustomState;
 import org.firmata4j.fsm.Event;
-import org.firmata4j.fsm.EventType;
 
 /**
  *
@@ -54,17 +52,10 @@ public class EchoSysexExampleMain {
     public static class CustomStringMessageState extends AbstractCustomState {
 
         @Override
-        public void process(byte b) {
-            if (b == FirmataToken.END_SYSEX) {
-                byte[] buffer = getBuffer();
-                String value = new String(FirmataUtils.decodeBytes(buffer));
-                Event event = new Event(FirmataToken.CUSTOM_SYSEX_MESSAGE, EventType.FIRMATA_MESSAGE_EVENT_TYPE);
-                event.setBodyItem(FirmataToken.STRING_MESSAGE, value);
-                transitTo(WaitingForMessageState.class, b);
-                publish(event);
-            } else {
-                bufferize(b);
-            }
+        protected boolean handleEndSysexState(Event event) {
+            String value = new String(FirmataUtils.decodeBytes(getBuffer()));
+            event.setBodyItem(FirmataToken.STRING_MESSAGE, value);
+            return true;
         }
 
     }
