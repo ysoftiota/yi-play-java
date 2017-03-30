@@ -1,9 +1,9 @@
 package com.ysoft.iota.play.examples;
 
-import org.firmata4j.DeviceConfiguration;
-import org.firmata4j.I2CDevice;
-import org.firmata4j.I2CEvent;
-import org.firmata4j.firmata.FirmataDevice;
+import com.ysoft.firmata.DeviceConfiguration;
+import com.ysoft.firmata.I2CDevice;
+import com.ysoft.firmata.I2CEvent;
+import com.ysoft.firmata.impl.FirmataDevice;
 
 /**
  *

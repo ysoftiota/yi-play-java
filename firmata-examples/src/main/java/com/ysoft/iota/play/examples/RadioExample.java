@@ -1,13 +1,13 @@
 package com.ysoft.iota.play.examples;
 
 import java.util.Date;
-import org.firmata4j.AbstractCustomSysexEvent;
-import org.firmata4j.CustomSysexEventListener;
-import org.firmata4j.DeviceConfiguration;
-import org.firmata4j.firmata.FirmataDevice;
-import org.firmata4j.firmata.FirmataUtils;
-import org.firmata4j.fsm.AbstractCustomState;
-import org.firmata4j.fsm.Event;
+import com.ysoft.firmata.AbstractCustomSysexEvent;
+import com.ysoft.firmata.CustomSysexEventListener;
+import com.ysoft.firmata.DeviceConfiguration;
+import com.ysoft.firmata.impl.FirmataDevice;
+import com.ysoft.firmata.impl.FirmataUtils;
+import com.ysoft.firmata.impl.fsm.AbstractCustomState;
+import com.ysoft.firmata.impl.fsm.Event;
 
 /**
  *

@@ -1,10 +1,10 @@
 package com.ysoft.iota.play.examples;
 
-import org.firmata4j.DeviceConfiguration;
-import org.firmata4j.IOEvent;
-import org.firmata4j.Pin;
-import org.firmata4j.PinEventListener;
-import org.firmata4j.firmata.FirmataDevice;
+import com.ysoft.firmata.DeviceConfiguration;
+import com.ysoft.firmata.IOEvent;
+import com.ysoft.firmata.Pin;
+import com.ysoft.firmata.PinEventListener;
+import com.ysoft.firmata.impl.FirmataDevice;
 
 /**
  *
